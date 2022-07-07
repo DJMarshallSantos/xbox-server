@@ -11,70 +11,73 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(uuid())
-  name        String    
-  email       String    @unique
-  password    String    
-  cpf         String    @unique
-  isAdmin     Boolean   @default(false) @map("is_admin")
-  profiles    Profile[]
+  id       String    @id @default(uuid())
+  name     String
+  email    String    @unique
+  password String
+  cpf      String    @unique
+  isAdmin  Boolean   @default(false) @map("is_admin")
+  profiles Profile[]
 
-  createAt    DateTime  @default(now()) @map("created_at")
-  updateAt    DateTime  @default(now()) @map("updated_at")
+  createAt DateTime  @default(now()) @map("created_at")
+  updateAt DateTime  @default(now()) @map("updated_at")
   @@map("users")
 }
 
 model Profile {
-  id           String    @id @default(uuid())
-  title        String    @unique
-  imageURL     String    @map("image_url")
-  user         User      @relation(fields: [userId], references: [id])
-  userId       String    @map("user_id")
+  id           String        @id @default(uuid())
+  title        String        @unique
+  imageURL     String        @map("image_url")
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String        @map("user_id")
   profileGames ProfileGame[]
 
-  createAt     DateTime  @default(now()) @map("created_at")
-  updateAt     DateTime  @default(now()) @map("updated_at")
+  createAt     DateTime      @default(now()) @map("created_at")
+  updateAt     DateTime      @default(now()) @map("updated_at")
   @@map("profiles")
 }
 
 model Game {
-  id                 String    @id @default(uuid())
-  title              String    @unique
-  coverImageURL      String    @map("cover_image_url")
+  id                 String        @id @default(uuid())
+  title              String        @unique
+  coverImageURL      String        @map("cover_image_url")
   description        String
   year               Int
-  imdbScore          Int       @map("imdb_score")
-  trailerYouTubeUrl  String    @map("trailer_youtube_url")
-  gameplayYouTubeUrl String    @map("gameplay_youtube_url")
+  imdbScore          Float?        @map("imdb_score")
+  trailerYouTubeUrl  String        @map("trailer_youtube_url")
+  gameplayYouTubeUrl String        @map("gameplay_youtube_url")
   genres             Genre[]
-  profileGames       ProfileGame[] 
-  
-  createAt           DateTime  @default(now()) @map("created_at")
-  updateAt           DateTime  @default(now()) @map("updated_at")
+  profileGames       ProfileGame[]
+
+  createAt           DateTime      @default(now()) @map("created_at")
+  updateAt           DateTime      @default(now()) @map("updated_at")
   @@map("games")
 }
 
 model Genre {
-  id           String @id @default(uuid())
-  name         String @unique
-  games        Game[]
-  
-  createAt     DateTime  @default(now()) @map("created_at")
-  updateAt     DateTime  @default(now()) @map("updated_at")
+  id       String   @id @default(uuid())
+  name     String   @unique
+  games    Game[]
+
+  createAt DateTime @default(now()) @map("created_at")
+  updateAt DateTime @default(now()) @map("updated_at")
   @@map("genres")
 }
 
 model ProfileGame {
-  id           String    @id @default(uuid()) 
+  id        String   @id @default(uuid())
 
-  profile      Profile   @relation(fields: [profileId], references: [id])
-  profileId    String    @map("profile_id")
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId String   @map("profile_id")
 
-  game         Game      @relation(fields: [gameId], references: [id])
-  gameId       String    @map("game_id")
+  game      Game     @relation(fields: [gameId], references: [id])
+  gameId    String   @map("game_id")
 
-  createAt     DateTime  @default(now()) @map("created_at")
-  updateAt     DateTime  @default(now()) @map("updated_at")
+  favorite  Boolean  @default(false)
+  imdbScore Int
+
+  createAt  DateTime @default(now()) @map("created_at")
+  updateAt  DateTime @default(now()) @map("updated_at")
 
   @@unique([profileId, gameId])
   @@map("profile_to_game")

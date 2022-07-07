@@ -42,6 +42,14 @@ export class GamesController {
   @ApiOperation({
     summary: 'Get a Game by ID',
   })
+  @ApiOperation({
+    summary: 'Get a list of all favorite games by profile from database',
+  })
+  @Get('/favorites/:id')
+  findAllFavorites(@Param('id') id: string) {
+    return this.gamesService.findAllFavorites(id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.gamesService.findOne(id);

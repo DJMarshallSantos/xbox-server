@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from 'src/users/entities/user.entity';
 import { isAdmin } from 'src/utils/handle-admin.util';
 import { handleError } from 'src/utils/handle-error.util';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
-import { Game } from './entities/game.entity';
 
 @Injectable()
 export class GamesService {
@@ -13,27 +13,50 @@ export class GamesService {
 
   async create(dto: CreateGameDto, user: User) {
     isAdmin(user);
-    return await this.prisma.game
-      .create({
-        data: dto,
-        select: {
-          title: true,
-          coverImageURL: true,
-          description: true,
-          year: true,
-        },
-      })
-      .catch(handleError);
+    const data: Prisma.GameCreateInput = {
+      ...dto,
+      genres: {
+        connect: dto.genres?.map((genresID) => ({
+          id: genresID,
+        })),
+      },
+    };
+    return this.prisma.game.create({ data }).catch(handleError);
   }
 
   async findAll() {
-    return await this.prisma.game.findMany({
+    const GameList = await this.prisma.game.findMany({
       select: {
         id: true,
         title: true,
         coverImageURL: true,
         description: true,
         year: true,
+        genres: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (GameList.length == 0) {
+      return { message: 'No game in the records' };
+    } else {
+      return GameList;
+    }
+  }
+
+  findAllFavorites(id: string) {
+    return this.prisma.profileGame.findMany({
+      where: { profileId: id, favorite: true },
+      select: {
+        id: true,
+        game: {
+          select: {
+            title: true,
+          },
+        },
       },
     });
   }
@@ -44,6 +67,7 @@ export class GamesService {
       include: {
         genres: {
           select: {
+            id: true,
             name: true,
           },
         },
@@ -53,18 +77,47 @@ export class GamesService {
 
   async update(id: string, dto: UpdateGameDto, user: User) {
     isAdmin(user);
-    const data: Partial<Game> = { ...dto };
     return this.prisma.game
       .update({
         where: { id },
-        data,
+        data: {
+          ...dto,
+          genres: {
+            connect: dto.genres?.map((genresID) => ({
+              id: genresID,
+            })),
+          },
+        },
       })
       .catch(handleError);
   }
 
   async remove(id: string, user: User) {
     isAdmin(user);
-    await this.prisma.game.delete({ where: { id } });
+    await this.prisma.game.delete({ where: { id } }).catch(handleError);
     return { message: 'Game successfully deleted' };
+  }
+
+  async imdbUpdate(id: string) {
+    let imdbScore = 0;
+
+    const game = await this.prisma.game
+      .findUnique({ where: { id } })
+      .catch(handleError);
+
+    const games = await this.prisma.profileGame.findMany({
+      where: { gameId: id },
+    });
+
+    games.forEach((g) => {
+      imdbScore += g.imdbScore;
+    });
+    imdbScore = imdbScore / games.length;
+
+    game.imdbScore = +imdbScore.toFixed(2);
+    return this.prisma.game.update({
+      where: { id: game.id },
+      data: game,
+    });
   }
 }

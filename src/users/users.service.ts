@@ -11,17 +11,23 @@ import * as bcrypt from 'bcrypt';
 import { handleError } from 'src/utils/handle-error.util';
 import { isAdmin } from 'src/utils/handle-admin.util';
 import { ChangePassDto } from './dto/change-pass.dto';
+import { cpf } from 'cpf-cnpj-validator';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateUserDto) {
+    if (!cpf.isValid(dto.cpf)) {
+      return {
+        message: 'Invalid NIN (CPF). Please, key it in again!',
+      };
+    }
     const data: User = {
       ...dto,
       password: await bcrypt.hash(dto.password, 10),
     };
-    return await this.prisma.user
+    return this.prisma.user
       .create({
         data,
         select: {
@@ -35,8 +41,8 @@ export class UsersService {
       .catch(handleError);
   }
 
-  async findAll() {
-    return await this.prisma.user.findMany({
+  findAll() {
+    return this.prisma.user.findMany({
       select: {
         id: true,
         name: true,
@@ -48,18 +54,21 @@ export class UsersService {
     });
   }
 
-  async findOne(id: string) {
-    return await this.prisma.user.findUnique({
+  findOne(id: string) {
+    return this.prisma.user.findUnique({
       where: {
         id,
       },
     });
   }
 
-  async update(id: string, dto: UpdateUserDto, user: User) {
+  update(id: string, dto: UpdateUserDto, user: User) {
     isAdmin(user);
+    if (!cpf.isValid(dto.cpf)) {
+      return { message: 'Invalid NIN (CPF). Please, key it in again!' };
+    }
     const data: Partial<User> = { ...dto };
-    return await this.prisma.user
+    return this.prisma.user
       .update({
         where: { id },
         data,

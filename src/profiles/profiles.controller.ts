@@ -6,14 +6,20 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { LoggedUser } from 'src/utils/logged-user.decorator';
 import { User } from '../users/entities/user.entity';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { addGameDto } from './dto/add-game.dto';
 
+@UseGuards(AuthGuard())
+@ApiBearerAuth()
+@ApiTags('profile')
 @Controller('profiles')
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
@@ -57,5 +63,10 @@ export class ProfilesController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.profilesService.remove(id);
+  }
+
+  @Post('/addGame')
+  addGame(@Body() addGame: addGameDto) {
+    return this.profilesService.addGame(addGame);
   }
 }
