@@ -1,20 +1,20 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
-import { GamesService } from './games.service';
-import { CreateGameDto } from './dto/create-game.dto';
-import { UpdateGameDto } from './dto/update-game.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { LoggedUser } from 'src/utils/logged-user.decorator';
 import { User } from 'src/users/entities/user.entity';
+import { LoggedUser } from 'src/utils/logged-user.decorator';
+import { CreateGameDto } from './dto/create-game.dto';
+import { UpdateGameDto } from './dto/update-game.dto';
+import { GamesService } from './games.service';
 
 @UseGuards(AuthGuard())
 @ApiBearerAuth()
@@ -34,9 +34,9 @@ export class GamesController {
   @ApiOperation({
     summary: 'Get a list of all Games from the database',
   })
-  @Get()
-  findAll() {
-    return this.gamesService.findAll();
+  @Get(':skip')
+  findAll(@Param('skip') skip: number) {
+    return this.gamesService.findAll(+skip);
   }
 
   @ApiOperation({

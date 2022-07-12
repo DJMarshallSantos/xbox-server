@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
@@ -50,7 +51,7 @@ export class CreateGameDto {
     description: 'Rated score 0 - 5 (just integer numbers)',
     example: '3',
   })
-  @IsInt()
+  @IsNumber()
   @Min(0)
   @Max(5)
   @IsOptional()

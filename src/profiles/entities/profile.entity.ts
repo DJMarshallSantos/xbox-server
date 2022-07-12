@@ -3,7 +3,6 @@ export class Profile {
   title: string;
   imageURL: string;
   userId: string;
-
   createdAt?: Date;
   updatedAt?: Date;
 }

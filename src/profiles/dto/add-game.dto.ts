@@ -1,9 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsBoolean, IsInt, IsUUID, ValidateNested } from 'class-validator';
 
 class game {
+  @IsUUID()
   id: string;
+
+  @IsBoolean()
   fav: boolean;
+
+  @IsInt()
   imdb: number;
 }
 
@@ -21,5 +27,7 @@ export class addGameDto {
     example:
       '[{ "id":"", "fav":true, "imdb": 3},{ "id":"", "fav": false, "imdb": 4 }]',
   })
+  @ValidateNested({ each: true })
+  @Type(() => game)
   games: game[];
 }

@@ -16,6 +16,7 @@ import { User } from '../users/entities/user.entity';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { addGameDto } from './dto/add-game.dto';
+import { UpdateProfileGameDto } from './dto/update-game.dto';
 
 @UseGuards(AuthGuard())
 @ApiBearerAuth()
@@ -36,9 +37,9 @@ export class ProfilesController {
   @ApiOperation({
     summary: 'Get a list of all Profiles from the database',
   })
-  @Get()
-  findAll() {
-    return this.profilesService.findAll();
+  @Get(':skip')
+  findAll(@Param('skip') skip: number) {
+    return this.profilesService.findAll(+skip);
   }
 
   @ApiOperation({
@@ -65,8 +66,35 @@ export class ProfilesController {
     return this.profilesService.remove(id);
   }
 
+  @ApiOperation({
+    summary: "Add a game/s to user's profile",
+  })
   @Post('/addGame')
   addGame(@Body() addGame: addGameDto) {
     return this.profilesService.addGame(addGame);
+  }
+
+  @ApiOperation({
+    summary: "Update a game/s to user's profile",
+  })
+  @Patch('/updateGame')
+  updateGame(@Body() updateGameDto: UpdateProfileGameDto) {
+    return this.profilesService.updateGame(updateGameDto);
+  }
+
+  @ApiOperation({
+    summary: 'Get a list of all games with a profile ID',
+  })
+  @Get('/listGames/:id')
+  listGames(@Param('id') id: string) {
+    return this.profilesService.listGames(id);
+  }
+
+  @ApiOperation({
+    summary: 'Delete a game by Id from a profile',
+  })
+  @Delete('/deleteGame/:id')
+  deleteGame(@Param('id') id: string) {
+    return this.profilesService.deleteGame(id);
   }
 }

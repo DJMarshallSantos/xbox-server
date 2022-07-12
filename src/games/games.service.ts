@@ -24,8 +24,10 @@ export class GamesService {
     return this.prisma.game.create({ data }).catch(handleError);
   }
 
-  async findAll() {
+  async findAll(skip: number) {
     const GameList = await this.prisma.game.findMany({
+      skip: skip,
+      take: 10,
       select: {
         id: true,
         title: true,
@@ -37,6 +39,9 @@ export class GamesService {
             name: true,
           },
         },
+      },
+      orderBy: {
+        title: 'asc',
       },
     });
 

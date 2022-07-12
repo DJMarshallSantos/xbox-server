@@ -34,17 +34,17 @@ export class GenresController {
   @ApiOperation({
     summary: 'Get a list of all Genres from the database',
   })
-  @Get()
-  findAll() {
-    return this.genresService.findAll();
+  @Get(':skip')
+  findAll(@Param('skip') skip: number) {
+    return this.genresService.findAll(+skip);
   }
 
   @ApiOperation({
     summary: 'Get a list of all Games by Genre from the database',
   })
-  @Get('/games')
-  findAllGames() {
-    return this.genresService.findAllGames();
+  @Get('/games/:skip')
+  findAllGames(@Param('skip') skip: number) {
+    return this.genresService.findAllGames(+skip);
   }
 
   @ApiOperation({

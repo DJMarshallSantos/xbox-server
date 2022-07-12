@@ -18,7 +18,6 @@ model User {
   cpf      String    @unique
   isAdmin  Boolean   @default(false) @map("is_admin")
   profiles Profile[]
-
   createAt DateTime  @default(now()) @map("created_at")
   updateAt DateTime  @default(now()) @map("updated_at")
   @@map("users")
@@ -31,7 +30,6 @@ model Profile {
   user         User          @relation(fields: [userId], references: [id])
   userId       String        @map("user_id")
   profileGames ProfileGame[]
-
   createAt     DateTime      @default(now()) @map("created_at")
   updateAt     DateTime      @default(now()) @map("updated_at")
   @@map("profiles")
@@ -58,7 +56,6 @@ model Genre {
   id       String   @id @default(uuid())
   name     String   @unique
   games    Game[]
-
   createAt DateTime @default(now()) @map("created_at")
   updateAt DateTime @default(now()) @map("updated_at")
   @@map("genres")

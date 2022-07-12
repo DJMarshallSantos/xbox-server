@@ -16,12 +16,20 @@ export class GenresService {
     return this.prisma.genre.create({ data: dto }).catch(handleError);
   }
 
-  findAll() {
-    return this.prisma.genre.findMany();
+  findAll(skip: number) {
+    return this.prisma.genre.findMany({
+      skip: skip,
+      take: 10,
+      orderBy: {
+        name: 'asc',
+      },
+    });
   }
 
-  findAllGames() {
+  findAllGames(skip: number) {
     return this.prisma.genre.findMany({
+      skip: skip,
+      take: 10,
       include: {
         games: {
           select: {
@@ -29,6 +37,9 @@ export class GenresService {
             title: true,
           },
         },
+      },
+      orderBy: {
+        name: 'asc',
       },
     });
   }
